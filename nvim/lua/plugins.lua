@@ -24,6 +24,11 @@ local plugins = {
     {
         "loctvl842/monokai-pro.nvim"
     },
+    {
+        "catppuccin/nvim",
+        name = "catppuccin",
+        priority = 1000
+    },
 
     -- bar
     {
@@ -105,18 +110,18 @@ local plugins = {
 lazy.setup(plugins, opts)
 
 -- colorscheme
-require("monokai-pro").setup({
-    terminal_colors = true,
-    devicons = true,
-    filter = "classic"
-})
+-- require("monokai-pro").setup({
+--     terminal_colors = true,
+--     devicons = true,
+--     filter = "classic"
+-- })
 
-vim.cmd([[colorscheme monokai-pro]])
+vim.cmd([[colorscheme catppuccin]])
 
 -- bar
 require("lualine").setup {
     options = {
-        theme = 'monokai-pro',
+        theme = 'catppuccin',
         component_separators = '',
         section_separators = ''
     }
@@ -156,7 +161,7 @@ local on_attach = function(_, bufnr)
   vim.keymap.set('n', 'so', require('telescope.builtin').lsp_references, attach_opts)
 end
 
-local servers = { 'ltex', 'jedi_language_server' }
+local servers = { 'ltex' }
 for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
         on_attach = on_attach,

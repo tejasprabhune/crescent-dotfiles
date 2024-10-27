@@ -1,5 +1,5 @@
 require('static')
 require('plugins')
 require('nav')
-require('telescope')
+require('_telescope')
 require('ultisnips')
