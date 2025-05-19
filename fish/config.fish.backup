@@ -1,0 +1,29 @@
+set fish_greeting
+if status is-interactive
+    # Commands to run in interactive sessions can go here
+end
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+if test -f /Users/prabhune/miniforge3/bin/conda
+    eval /Users/prabhune/miniforge3/bin/conda "shell.fish" "hook" $argv | source
+else
+    if test -f "/Users/prabhune/miniforge3/etc/fish/conf.d/conda.fish"
+        . "/Users/prabhune/miniforge3/etc/fish/conf.d/conda.fish"
+    else
+        set -x PATH "/Users/prabhune/miniforge3/bin" $PATH
+    end
+end
+# <<< conda initialize <<<
+
+
+
+# pnpm
+set -gx PNPM_HOME "/Users/prabhune/Library/pnpm"
+if not string match -q -- $PNPM_HOME $PATH
+  set -gx PATH "$PNPM_HOME" $PATH
+end
+# pnpm end
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/prabhune/Downloads/google-cloud-sdk/path.fish.inc' ]; . '/Users/prabhune/Downloads/google-cloud-sdk/path.fish.inc'; end
