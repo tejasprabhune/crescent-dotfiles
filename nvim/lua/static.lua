@@ -16,3 +16,8 @@ vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 vim.keymap.set("n", "<leader>jj", "<cmd>bnext<CR>")
 vim.keymap.set("n", "<leader>kk", "<cmd>bprev<CR>")
 vim.keymap.set("n", "<leader>dd", "<cmd>bdelete<CR>")
+
+vim.diagnostic.config {
+    virtual_text = true,
+    virtual_lines = false
+}

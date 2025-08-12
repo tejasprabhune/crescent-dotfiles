@@ -43,7 +43,13 @@ local plugins = {
     },
     {
         "williamboman/mason-lspconfig.nvim",
-        lazy = false
+        lazy = false,
+        init = function()
+            vim.api.nvim_create_autocmd({'BufWritePre'}, {
+                pattern = "*.py",
+                command = "lua vim.lsp.buf.format()"
+            })
+        end,
     },
     {
         "neovim/nvim-lspconfig",
@@ -80,9 +86,6 @@ local plugins = {
     {
         "lervag/vimtex"
     },
-    {
-        "sirver/ultisnips"
-    },
 
     -- copilot
     {
@@ -91,11 +94,13 @@ local plugins = {
 
     -- rust
     {
-        "rust-lang/rust.vim"
-    },
-    {
         "simrat39/rust-tools.nvim"
     },
+    -- {
+    --     "mrcjkb/rustaceanvim",
+    --     version = '^6',
+    --     lazy = false,
+    -- },
 
     -- autopair
     {
@@ -124,6 +129,9 @@ require("lualine").setup {
         theme = 'catppuccin',
         component_separators = '',
         section_separators = ''
+    },
+    sections = {
+        lualine_c = { { 'filename', path=2 } }
     }
 }
 
@@ -136,11 +144,16 @@ lsp_zero.on_attach(function(client, bufnr)
 end)
 
 require('mason').setup({})
-require('mason-lspconfig').setup({
-    handlers = {
-        lsp_zero.default_setup
-    },
-})
+require('mason-lspconfig').setup {
+    automatic_enable = true, -- HACK: rely on lspconfig[server_name].setup to enable the LSPs. For some reason, pyright doesn't get enabled this way
+    handlers = { 
+        function(server_name)
+            if server_name == 'rust_analyzer' then
+                print('NOPE!')
+            end
+        end
+    }
+}
 
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -161,13 +174,21 @@ local on_attach = function(_, bufnr)
   vim.keymap.set('n', 'so', require('telescope.builtin').lsp_references, attach_opts)
 end
 
-local servers = { 'ltex' }
+vim.keymap.set("n", '<leader>i', 
+    function() 
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({0}),{0})
+    end
+)
+
+
+local servers = { "ocamllsp" }
 for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
         on_attach = on_attach,
         capabilities = capabilities
     }
 end
+
 
 local cmp = require("cmp")
 
@@ -229,7 +250,7 @@ cmp.setup({
 })
 
 vim.g.tex_flavor = "latex"
-vim.g.vimtex_view_method = "skim"
+vim.g.vimtex_view_method = "zathura"
 
 
 vim.keymap.set('i', '<C-J>', 'copilot#Accept("\\<CR>")', {
@@ -240,18 +261,6 @@ vim.g.copilot_no_tab_map = true
 
 -- rust
 vim.g.rustfmt_autosave = 1
-
-local rt = require("rust-tools")
-rt.setup({
-  server = {
-    on_attach = function(_, bufnr)
-      -- Hover actions
-      vim.keymap.set("n", "<C-a>", rt.hover_actions.hover_actions, { buffer = bufnr })
-      -- Code action groups
-      vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
-    end,
-  },
-})
 
 -- treesitter
 require('nvim-treesitter.configs').setup {
@@ -269,6 +278,10 @@ require('nvim-treesitter.configs').setup {
   }
 }
 
+-- local ft_to_parser = require("nvim-treesitter.parsers").filetype_to_parsername
+-- ft_to_parser.mdx = "markdown"
+vim.treesitter.language.register('markdown', 'mdx')
+
 require('nvim-autopairs').setup()
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 cmp.event:on(
@@ -277,3 +290,5 @@ cmp.event:on(
 )
 
 require('nvim-ts-autotag').setup()
+
+require("rust-tools").setup({})
